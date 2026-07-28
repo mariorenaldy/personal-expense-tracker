@@ -1,0 +1,57 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table users {
+  id bigint [pk, increment]
+  email varchar [not null, unique]
+  username varchar [not null, unique]
+  password_hash varchar [not null]
+  display_name varchar [not null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table categories {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  name varchar [not null]
+  color varchar
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (user_id, name) [unique]
+  }
+}
+Ref categories_users: categories.user_id > users.id
+
+Table expenses {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  category_id bigint [not null]
+  amount numeric(12,2) [not null, note: 'CHECK (amount > 0) in migration']
+  expense_date date [not null]
+  note varchar
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (user_id, expense_date)
+  }
+}
+Ref expenses_categories: expenses.category_id > categories.id [delete: restrict]
+Ref expenses_users: expenses.user_id > users.id
+
+Records users(id, email, username, password_hash, display_name) {
+  1, 'alice@gmail.com', 'alice', 'xyz', 'Alice'
+  2, 'bob@gmail.com', 'bob', 'xyz', 'Bob'
+}
+
+Records categories(id, user_id, name) {
+  1, 1, 'Groceries'
+  2, 1, 'Bills'
+  3, 2, 'Groceries'
+}
+
+Records expenses(id, user_id, category_id, amount, expense_date, note) {
+  1, 1, 1, 100000, '2026-07-01', 'monthly groceries'
+  2, 1, 2, 400000, '2026-07-03', 'electricity'
+}
