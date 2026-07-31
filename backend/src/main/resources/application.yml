@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/expense_tracker
+    username: dev
+    password: dev
+  jpa:
+    hibernate:
+      ddl-auto: validate
